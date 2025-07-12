@@ -11,13 +11,18 @@ class Video(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
     liked_by = models.ManyToManyField(User, related_name='liked_videos', blank=True)
+    disliked_by = models.ManyToManyField(User, related_name='disliked_videos', blank=True)
     category = models.CharField(max_length=100, blank=True, null=True)
+
 
     def __str__(self):
         return self.title
 
     def total_likes(self):
         return self.liked_by.count()
+    
+    def total_dislikes(self):
+        return self.disliked_by.count()
 
 
 class Comment(models.Model):

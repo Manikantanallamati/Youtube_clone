@@ -49,3 +49,24 @@ def upload_video(request):
     else:
         form = VideoUploadForm()
     return render(request, 'upload_video.html', {'form': form})
+
+@login_required
+def react_video(request, video_id, reaction):
+    video = get_object_or_404(Video, id=video_id)
+    user = request.user
+
+    if reaction == 'like':
+        video.disliked_by.remove(user)
+        if user in video.liked_by.all():
+            video.liked_by.remove(user) 
+        else:
+            video.liked_by.add(user)
+
+    elif reaction == 'dislike':
+        video.liked_by.remove(user)
+        if user in video.disliked_by.all():
+            video.disliked_by.remove(user)
+        else:
+            video.disliked_by.add(user)
+
+    return redirect('video_detail', video_id=video.id)

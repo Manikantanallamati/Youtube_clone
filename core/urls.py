@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/',views.logout_view,name='logout'),
     path('upload/', views.upload_video, name='upload_video'),
     path('video/<int:video_id>/', views.video_detail, name='video_detail'),
+    path('video/<int:video_id>/<str:reaction>/', views.react_video, name='react_video'),
 ]

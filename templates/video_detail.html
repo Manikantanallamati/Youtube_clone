@@ -1,10 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<h2>{{ video.title }}</h2>
+<video width="60%" controls>
+  <source src="{{ video.file.url }}" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+<div class="reaction-buttons">
+  <form method="POST" action="{% url 'react_video' video.id 'like' %}">
+    {% csrf_token %}
+    <button type="submit" class="{% if user in video.liked_by.all %}liked{% endif %}">
+      👍 {{ video.total_likes }}
+    </button>
+  </form>
 
-{% block content %}
-  <h2>{{ video.title }}</h2>
-  <video width="600" controls>
-    <source src="{{ video.file.url }}" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-  <p>{{ video.description }}</p>
+  <form method="POST" action="{% url 'react_video' video.id 'dislike' %}">
+    {% csrf_token %}
+    <button type="submit" class="{% if user in video.disliked_by.all %}disliked{% endif %}">
+      👎 {{ video.total_dislikes }}
+    </button>
+  </form>
+</div>
+
+<p><strong>Description: </strong><small>{{ video.description }}</small></p>
+
 {% endblock %}
