@@ -45,7 +45,7 @@ def upload_video(request):
             video = form.save(commit=False)
             video.uploaded_by = request.user
             video.save()
-            return redirect('landing')  # or 'landing_page'
+            return redirect('landing') 
     else:
         form = VideoUploadForm()
     return render(request, 'upload_video.html', {'form': form})
