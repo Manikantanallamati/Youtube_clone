@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  /* margin-right: 10px; */
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
   padding-top: 60px;
@@ -8,14 +9,15 @@ body {
 .navbar {
   position: fixed;
   top: 0;
-  width: 100%;
+  width: 98%;
   z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: white;
-  padding: 12px 24px;
+  padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* padding-right: 50px; */
 }
 
 .navbar a {
@@ -23,6 +25,7 @@ body {
   color: #cc0000;
   font-weight: bold;
   font-size: 18px;
+  /* margin-left: 10px; */
 }
 
 .navbar-buttons a {
@@ -41,9 +44,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
+  margin: 60px;
 }
 
 .register {
@@ -61,4 +62,26 @@ form{
     justify-content: center;
     flex-direction: column;
     align-items: center;
+}
+
+.video-uploader {
+  font-size: 13px;
+  color: #777;
+  margin-top: 5px;
+}
+
+.cancel-btn {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 10px;
+  padding: 6px 12px;
+  background-color: #ccc;
+  color: #000;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+  background-color: #aaa;
 }
