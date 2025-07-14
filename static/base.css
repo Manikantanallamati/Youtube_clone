@@ -3,8 +3,8 @@ body {
   padding: 0;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-  overflow-x: hidden; 
-  padding-top: 60px;  
+  overflow-x: hidden;
+  padding-top: 60px;
 }
 
 .navbar {
@@ -55,7 +55,6 @@ body {
   color: white;
 }
 
-
 form {
   display: flex;
   flex-direction: column;
@@ -89,7 +88,9 @@ form {
 }
 
 .container {
-  margin: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 h2 {
@@ -100,7 +101,7 @@ h2 {
 
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); 
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   padding: 0 20px 40px 20px;
   width: 100%;
@@ -112,6 +113,7 @@ h2 {
   border: 1px solid #ddd;
   border-radius: 10px;
   overflow: hidden;
+  width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
   display: flex;
@@ -124,7 +126,7 @@ h2 {
 
 .video-thumbnail {
   width: 100%;
-  height: 160px;
+  height: 180px;
   object-fit: cover;
   background-color: #eee;
 }
@@ -189,12 +191,13 @@ h2 {
   color: #dc3545;
 }
 
-
+/* Responsive layout */
 @media (max-width: 600px) {
   .video-grid {
     grid-template-columns: 1fr;
   }
-  video{
+
+  video {
     width: 100%;
   }
 }

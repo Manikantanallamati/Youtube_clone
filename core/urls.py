@@ -9,4 +9,6 @@ urlpatterns = [
     path('upload/', views.upload_video, name='upload_video'),
     path('video/<int:video_id>/', views.video_detail, name='video_detail'),
     path('video/<int:video_id>/<str:reaction>/', views.react_video, name='react_video'),
+    path('dashboard/',views.user_dashboard,name='user_dashboard'),
+    path('follow/<int:user_id>/', views.toggle_follow, name='toggle_follow'),
 ]

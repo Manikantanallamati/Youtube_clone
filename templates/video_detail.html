@@ -18,7 +18,24 @@
       👎 {{ video.total_dislikes }}
     </button>
   </form>
+  
+  {% if user.is_authenticated and user != video.uploaded_by %}
+  {% if video.uploaded_by.profile in user.profile.following.all %}
+  <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Unsubscribe</button>
+  </form>
+  {% else %}
+  <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
+    {% csrf_token %}
+    <button type="submit">Subscribe</button>
+  </form>
+  {% endif %}
+  {% endif %}
+  
 </div>
+<p>Uploaded by: {{ video.uploaded_by.username }}</p>
+<p>{{ video.uploaded_by.profile.followers.count }} Subscribers</p>
 
 <p><strong>Description: </strong><small>{{ video.description }}</small></p>
 

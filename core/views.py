@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import logout
 from .forms import VideoUploadForm
-from .models import Video
+from .models import Video,Profile
 import random
-
+from django.contrib.auth.models import User
 
 
 def video_detail(request, video_id):
@@ -70,3 +70,40 @@ def react_video(request, video_id, reaction):
             video.disliked_by.add(user)
 
     return redirect('video_detail', video_id=video.id)
+
+
+@login_required
+def user_dashboard(request):
+    user = request.user
+    try:
+        profile = user.profile
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(user=user)
+
+    videos = Video.objects.filter(uploaded_by=request.user)
+    videos_count = videos.count()
+
+    context = {
+        'videos': videos,
+        'videos_count': videos_count,
+        'followers_count': profile.followers.count(),
+        'following_count': profile.following.count(),
+        'followers': profile.followers.all(),
+        'following': profile.following.all(),
+    }
+
+    return render(request, 'dashboard.html', context)
+
+@login_required
+def toggle_follow(request, user_id):
+    current_user_profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    target_user = get_object_or_404(User, id=user_id)
+    target_profile, _ = Profile.objects.get_or_create(user=target_user)
+
+    if target_profile in current_user_profile.following.all():
+        current_user_profile.following.remove(target_profile)
+    else:
+        current_user_profile.following.add(target_profile)
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
