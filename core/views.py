@@ -4,13 +4,20 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import logout
 from .forms import VideoUploadForm
-from .models import Video,Profile
+from .models import Video,Profile,Comment
 import random
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 
 def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
+    session_key = f'viewed_video_{video.id}'
+    if not request.session.get(session_key, False):
+        video.views += 1
+        video.save(update_fields=['views'])
+        request.session[session_key] = True
     return render(request, 'video_detail.html', {'video': video})
 
 def landing_page(request):
@@ -107,3 +114,40 @@ def toggle_follow(request, user_id):
         current_user_profile.following.add(target_profile)
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from .models import Video, Comment
+
+def load_comments(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    comments = video.comments.select_related('user').order_by('-created_at')
+    data = [
+        {
+            'user': c.user.username,
+            'comment': c.comment,
+            'created_at': c.created_at.strftime('%Y-%m-%d %H:%M')
+        } for c in comments
+    ]
+    return JsonResponse({'comments': data})
+
+@require_POST
+@login_required
+def add_comment(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    text = request.POST.get('text')
+    if not text:
+        return JsonResponse({'error': 'Empty comment'}, status=400)
+
+    comment = Comment.objects.create(
+        video=video,
+        user=request.user,
+        comment=text
+    )
+    return JsonResponse({
+        'user': comment.user.username,
+        'comment': comment.comment,
+        'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M')
+    })

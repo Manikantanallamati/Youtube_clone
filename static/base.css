@@ -3,9 +3,51 @@ body {
   padding: 0;
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
   overflow-x: hidden;
   padding-top: 60px;
 }
+.theme-toggle-btn{
+  margin-left: 10px;
+}
+
+.theme-toggle {
+  cursor: pointer;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+}
+
+
+.dark-mode {
+  background-color: #121212;
+  color: #a4a1a1;
+}
+
+.navbar-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
+
+}
+
+.theme-toggle {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  margin-right: 20%;
+
+}
+
+.dark-mode a {
+  color: #90caf9;
+}
+
 
 .navbar {
   position: fixed;
@@ -20,8 +62,6 @@ body {
   background-color: white;
   padding: 12px 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 .navbar a {
@@ -38,6 +78,7 @@ body {
   align-items: center;
   gap: 10px;
   max-width: 100%;
+  margin-right: 30px;
 }
 
 .navbar-buttons a {
@@ -89,7 +130,7 @@ form {
 
 .container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 30px auto;
   padding: 20px;
 }
 
@@ -191,7 +232,6 @@ h2 {
   color: #dc3545;
 }
 
-/* Responsive layout */
 @media (max-width: 600px) {
   .video-grid {
     grid-template-columns: 1fr;
@@ -199,6 +239,9 @@ h2 {
 
   video {
     width: 100%;
+  }
+  .container{
+    padding: 30px;
   }
 }
 

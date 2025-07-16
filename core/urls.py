@@ -8,7 +8,10 @@ urlpatterns = [
     path('logout/',views.logout_view,name='logout'),
     path('upload/', views.upload_video, name='upload_video'),
     path('video/<int:video_id>/', views.video_detail, name='video_detail'),
-    path('video/<int:video_id>/<str:reaction>/', views.react_video, name='react_video'),
     path('dashboard/',views.user_dashboard,name='user_dashboard'),
     path('follow/<int:user_id>/', views.toggle_follow, name='toggle_follow'),
+    path('video/<int:video_id>/comments/', views.load_comments, name='load_comments'),
+    path('video/<int:video_id>/add-comment/', views.add_comment, name='add_comment'),
+    path('video/<int:video_id>/<str:reaction>/', views.react_video, name='react_video'),
+
 ]

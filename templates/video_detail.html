@@ -1,9 +1,18 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'comment.css' %}">
+{% endblock %}
+
+{% block content %}
 <h2>{{ video.title }}</h2>
+
 <video width="60%" controls>
   <source src="{{ video.file.url }}" type="video/mp4" />
   Your browser does not support the video tag.
 </video>
+
 <div class="reaction-buttons">
   <form method="POST" action="{% url 'react_video' video.id 'like' %}">
     {% csrf_token %}
@@ -18,25 +27,108 @@
       👎 {{ video.total_dislikes }}
     </button>
   </form>
-  
+
+  <p><strong>Views:</strong> {{ video.views }}</p>
+
+  <!-- Comments toggle button -->
+  <button id="loadCommentsBtn">Comments</button>
+
+  <!-- Comment section -->
+  <div id="commentsSection" style="display: none; margin-top: 20px;">
+    <div id="commentsList" style="margin-bottom: 20px;"></div>
+
+    {% if user.is_authenticated %}
+      <form id="commentForm">
+        {% csrf_token %}
+        <textarea id="commentText" placeholder="Add a comment..." required style="width: 100%; height: 60px;"></textarea>
+        <button type="submit">Post</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'login' %}">Login</a> to post comments.</p>
+    {% endif %}
+  </div>
+
   {% if user.is_authenticated and user != video.uploaded_by %}
-  {% if video.uploaded_by.profile in user.profile.following.all %}
-  <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
-    {% csrf_token %}
-    <button type="submit">Unsubscribe</button>
-  </form>
-  {% else %}
-  <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
-    {% csrf_token %}
-    <button type="submit">Subscribe</button>
-  </form>
+    {% if video.uploaded_by.profile in user.profile.following.all %}
+      <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Unsubscribe</button>
+      </form>
+    {% else %}
+      <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Subscribe</button>
+      </form>
+    {% endif %}
   {% endif %}
-  {% endif %}
-  
 </div>
+
 <p>Uploaded by: {{ video.uploaded_by.username }}</p>
 <p>{{ video.uploaded_by.profile.followers.count }} Subscribers</p>
-
 <p><strong>Description: </strong><small>{{ video.description }}</small></p>
+
+<script>
+  const commentsBtn = document.getElementById("loadCommentsBtn");
+  const commentsSection = document.getElementById("commentsSection");
+  const commentsList = document.getElementById("commentsList");
+  const commentForm = document.getElementById("commentForm");
+  const videoId = {{ video.id }};
+
+  commentsBtn.addEventListener("click", () => {
+  commentsSection.style.display = commentsSection.style.display === "none" ? "block" : "none";
+
+  if (commentsList.innerHTML === '') {
+    fetch(`/video/${videoId}/comments/`)
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to load comments");
+        return response.json();
+      })
+      .then(data => {
+        data.comments.forEach(c => {
+          const div = document.createElement('div');
+          div.style.marginBottom = "10px";
+          div.innerHTML = `<strong>${c.user}</strong>: ${c.comment} <small>${c.created_at}</small>`;
+          commentsList.appendChild(div);
+        });
+      })
+      .catch(err => {
+        console.error("Comments load error:", err);
+        commentsList.innerHTML = `<p style="color: red;">Could not load comments.</p>`;
+      });
+  }
+});
+
+if (commentForm) {
+  commentForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const text = document.getElementById("commentText").value;
+
+    fetch(`/video/${videoId}/add-comment/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ text })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Server returned non-200");
+      return res.json();
+    })
+    .then(data => {
+      console.log("Server responded:", data);
+      const div = document.createElement("div");
+      div.innerHTML = `<strong>${data.user}</strong>: ${data.comment} <small>${data.created_at}</small>`;
+      commentsList.prepend(div);
+      document.getElementById("commentText").value = "";
+    })
+    .catch(err => {
+      console.error("Comment post error:", err);
+      alert("Failed to post comment. Please login or try again.");
+    });
+  });
+}
+
+</script>
 
 {% endblock %}
