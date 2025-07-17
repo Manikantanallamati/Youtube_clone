@@ -6,6 +6,7 @@
     <title>{% block title %}YouTube Clone{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href='{% static "base.css" %}' />
+    <meta name="csrf-token" content="{{ csrf_token }}">
     {% block extra_css %}{% endblock %}
   </head>
   <body>

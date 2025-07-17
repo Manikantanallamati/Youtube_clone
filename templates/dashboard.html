@@ -1,11 +1,6 @@
-{% extends 'base.html' %}
-
-{% block extra_css %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'dashboard.css' %}">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block extra_css %} {% load static %}
+<link rel="stylesheet" href="{% static 'dashboard.css' %}" />
+{% endblock %} {% block content %}
 <div class="container">
   <h1 class="dashboard-heading">My Dashboard</h1>
 
@@ -27,16 +22,26 @@
   <h2 class="videos-heading">My Videos</h2>
   <div class="dashboard-videos-grid">
     {% for video in videos %}
-      <div class="dashboard-video-card">
-        <a href="{% url 'video_detail' video.id %}">
-          <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="dashboard-thumbnail">
-          <h3>{{ video.title }}</h3>
-        </a>
-        <p>{{ video.description|truncatewords:10 }}</p>
-        <p class="uploaded-date">Uploaded at: {{ video.uploaded_at }}</p>
+    <div class="dashboard-video-card">
+      <a href="{% url 'video_detail' video.id %}" class="video-link">
+    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="dashboard-thumbnail">
+    <h3>{{ video.title }}</h3>
+  </a>
+      <p>{{ video.description|truncatewords:10 }}</p>
+      <p class="uploaded-date">Uploaded at: {{ video.uploaded_at }}</p>
+
+      <div class="video-actions">
+        <a href="{% url 'edit_video' video.id %}" class="btn btn-edit"
+          >✏️ Edit</a
+        >
+        <a href="{% url 'delete_video' video.id %}" class="btn btn-delete"
+          >🗑️ Delete</a
+        >
       </div>
+    </div>
+
     {% empty %}
-      <p>You haven't uploaded any videos yet.</p>
+    <p>You haven't uploaded any videos yet.</p>
     {% endfor %}
   </div>
 </div>

@@ -39,12 +39,6 @@ def register(request):
     return render(request, 'register.html', {'form': form})
 
 @login_required
-def home(request):
-    videos = list(Video.objects.all())
-    random.shuffle(videos)
-    return render(request, 'home.html', {'videos': videos})
-
-@login_required
 def upload_video(request):
     if request.method == 'POST':
         form = VideoUploadForm(request.POST, request.FILES)
@@ -115,39 +109,109 @@ def toggle_follow(request, user_id):
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from .models import Video, Comment
-
 def load_comments(request, video_id):
-    video = get_object_or_404(Video, id=video_id)
-    comments = video.comments.select_related('user').order_by('-created_at')
-    data = [
-        {
-            'user': c.user.username,
-            'comment': c.comment,
-            'created_at': c.created_at.strftime('%Y-%m-%d %H:%M')
-        } for c in comments
-    ]
-    return JsonResponse({'comments': data})
+    top_level_comments = Comment.objects.filter(video_id=video_id, parent__isnull=True).order_by('-created_at')
+
+    def serialize(comment):
+        return {
+            "id": comment.id,
+            "user": comment.user.username,
+            "comment": comment.comment,
+            "created_at": comment.created_at.strftime("%Y-%m-%d %H:%M"),
+            "replies": [
+                {
+                    "id": reply.id,
+                    "user": reply.user.username,
+                    "comment": reply.comment,
+                    "created_at": reply.created_at.strftime("%Y-%m-%d %H:%M"),
+                }
+                for reply in comment.replies.all().order_by('created_at')
+            ]
+        }
+
+    data = {"comments": [serialize(c) for c in top_level_comments]}
+    return JsonResponse(data)
 
 @require_POST
 @login_required
 def add_comment(request, video_id):
     video = get_object_or_404(Video, id=video_id)
     text = request.POST.get('text')
+    parent_id = request.POST.get('parent_id')
+
     if not text:
         return JsonResponse({'error': 'Empty comment'}, status=400)
+
+    parent = None
+    if parent_id:
+        try:
+            parent = Comment.objects.get(id=parent_id)
+        except Comment.DoesNotExist:
+            pass
 
     comment = Comment.objects.create(
         video=video,
         user=request.user,
-        comment=text
+        comment=text,
+        parent=parent
     )
+
     return JsonResponse({
-        'user': comment.user.username,
-        'comment': comment.comment,
-        'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M')
-    })
+    'user': comment.user.username,
+    'comment': comment.comment,
+    'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M'),
+    'parent_id': parent.id if parent else None, 
+    'id': comment.id
+})
+
+from django.http import JsonResponse
+from .models import Comment
+
+def get_comments(request, video_id):
+    comments = Comment.objects.filter(video_id=video_id, parent=None).order_by('-created_at')
+    
+    def serialize_comment(comment):
+        return {
+            'id': comment.id,
+            'user': comment.user.username,
+            'comment': comment.text,
+            'created_at': comment.created_at.strftime("%Y-%m-%d %H:%M"),
+            'replies': [
+                {
+                    'id': reply.id,
+                    'user': reply.user.username,
+                    'comment': reply.text,
+                    'created_at': reply.created_at.strftime("%Y-%m-%d %H:%M")
+                } for reply in comment.replies.all().order_by('created_at')
+            ]
+        }
+
+    data = {
+        'comments': [serialize_comment(comment) for comment in comments]
+    }
+    return JsonResponse(data)
+
+
+@login_required
+def edit_video(request, video_id):
+    video = get_object_or_404(Video, id=video_id, uploaded_by=request.user)
+
+    if request.method == 'POST':
+        form = VideoUploadForm(request.POST, request.FILES, instance=video)
+        if form.is_valid():
+            form.save()
+            return redirect('user_dashboard') 
+    else:
+        form = VideoUploadForm(instance=video)
+
+    return render(request, 'edit_video.html', {'form': form, 'video': video})
+
+@login_required
+def delete_video(request, video_id):
+    video = get_object_or_404(Video, id=video_id, uploaded_by=request.user)
+
+    if request.method == 'POST':
+        video.delete()
+        return redirect('user_dashboard')
+
+    return render(request, 'confirm_delete.html', {'video': video})

@@ -5,9 +5,7 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit"
-        style="width: 100%; padding: 10px; background-color: #cc0000; color: white; border: none; border-radius: 4px;">
-        Login
-    </button>
+    <button type="submit" class="btn-login">Login</button>
+
 </form>
 {% endblock %}
