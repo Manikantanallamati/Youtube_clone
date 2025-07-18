@@ -14,5 +14,4 @@ urlpatterns = [
     path('video/<int:video_id>/delete/', views.delete_video, name='delete_video'),
     path('video/<int:video_id>/<str:reaction>/', views.react_video, name='react_video'),
     path('video/<int:video_id>/', views.video_detail, name='video_detail'),
-    path('search/', views.video_search, name='video_search'),
 ]

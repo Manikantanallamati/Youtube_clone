@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from core.search.document import VideoDocument
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -13,12 +11,6 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-def video_search(request):
-    query = request.GET.get('q', '')
-    results = []
-    if query:
-        results = VideoDocument.search().query("match", title=query).to_queryset()
-    return render(request, 'video_search.html', {'results': results, 'query': query})
 
 def video_detail(request, video_id):
     video = get_object_or_404(Video, id=video_id)
@@ -29,12 +21,9 @@ def video_detail(request, video_id):
         request.session[session_key] = True
     return render(request, 'video_detail.html', {'video': video})
 
+
 def landing_page(request):
-    query = request.GET.get('q', '')
-    if query:
-        videos = VideoDocument.search().query("match", title=query).to_queryset()
-    else:
-        videos = Video.objects.all().order_by('-uploaded_at')
+    videos = Video.objects.all().order_by('-uploaded_at')
     return render(request, 'landing.html', {'videos': videos})
 
 def logout_view(request):
