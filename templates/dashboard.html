@@ -24,9 +24,13 @@
     {% for video in videos %}
     <div class="dashboard-video-card">
       <a href="{% url 'video_detail' video.id %}" class="video-link">
-    <img src="{{ video.thumbnail.url }}" alt="{{ video.title }}" class="dashboard-thumbnail">
-    <h3>{{ video.title }}</h3>
-  </a>
+        <img
+          src="{{ video.thumbnail.url }}"
+          alt="{{ video.title }}"
+          class="dashboard-thumbnail"
+        />
+        <h3>{{ video.title }}</h3>
+      </a>
       <p>{{ video.description|truncatewords:10 }}</p>
       <p class="uploaded-date">Uploaded at: {{ video.uploaded_at }}</p>
 

@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
+{% include 'search_form.html' %}
 {% load static %}
 
 {% block content %}
+{% include 'search_form.html' %}
+{% if request.GET.q %}
+  {% comment %} <h2>Search results for "{{ request.GET.q }}"</h2> {% endcomment %}
+  {% if videos|length == 0 %}
+    <p>No videos found.</p>
+  {% endif %}
+{% endif %}
 <div class="video-grid">
   {% for video in videos %}
     <div class="video-card">
@@ -23,28 +31,3 @@
 {% endblock %}
 
 
-
-{% comment %} 
-{% extends 'base.html' %}
-
-{% block title %}Welcome{% endblock %}
-
-{% block content %}
-<h2>Videos</h2>
-{% for video in videos %}
-  <div style="margin-bottom: 20px;">
-    <h3>{{ video.title }}</h3>
-    {% if video.thumbnail %}
-      <img src="{{ video.thumbnail.url }}" width="200px">
-    {% endif %}
-    <p>{{ video.description|truncatewords:10 }}</p>
-    <video width="400" controls>
-      <source src="{{ video.file.url }}" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-  </div>
-{% empty %}
-  <p>No videos uploaded yet.</p>
-{% endfor %}
-
-{% endblock %} {% endcomment %}
