@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'http://localhost:9200'
+        'hosts': 'http://localhost:9200,https://youtube-clone-jh26.onrender.com'
     },
 }
 
