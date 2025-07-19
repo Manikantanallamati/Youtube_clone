@@ -1,8 +1,8 @@
 <h2>Search Results for "{{ query }}"</h2>
 <ul>
     {% for video in results %}
-        <li>{{ video.title }} - {{ video.description }}</li>
+    <li>{{ video.title }} - {{ video.description }}</li>
     {% empty %}
-        <li>No videos found.</li>
+    <li>No videos found.</li>
     {% endfor %}
 </ul>

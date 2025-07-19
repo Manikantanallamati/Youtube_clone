@@ -1,33 +1,36 @@
-{% extends 'base.html' %}
-{% include 'search_form.html' %}
-{% load static %}
-
-{% block content %}
-{% include 'search_form.html' %}
-{% if request.GET.q %}
-  {% comment %} <h2>Search results for "{{ request.GET.q }}"</h2> {% endcomment %}
-  {% if videos|length == 0 %}
-    <p>No videos found.</p>
-  {% endif %}
-{% endif %}
+{% extends 'base.html' %} {% include 'search_form.html' %} {% load static %} 
+{% block content %} {% include 'search_form.html' %} {% if request.GET.q %} 
+{% if videos|length == 0 %}
+<p>No videos found.</p>
+{% endif %} {% endif %}
 <div class="video-grid">
-  {% for video in videos %}
+    {% for video in videos %}
     <div class="video-card">
-      <a href="{% url 'video_detail' video.id %}">
-        {% if video.thumbnail %}
-          <img src="{{ video.thumbnail.url }}" alt="Thumbnail" class="video-thumbnail">
-        {% else %}
-          <img src="{% static 'default-thumbnail.jpg' %}" alt="Default Thumbnail" class="video-thumbnail">
-        {% endif %}
-      </a>
-      <div class="video-info">
-        <div class="video-title">{{ video.title|truncatechars:40 }}</div>
-        <div class="video-description">{{ video.description|truncatechars:60 }}</div>
-        <div class="video-uploader">Uploaded by: <strong>{{ video.uploaded_by.username }}</strong></div>
-      </div>
+        <a href="{% url 'video_detail' video.id %}">
+            {% if video.thumbnail %}
+            <img
+                src="{{ video.thumbnail.url }}"
+                alt="Thumbnail"
+                class="video-thumbnail"
+            />
+            {% else %}
+            <img
+                src="{% static 'default-thumbnail.jpg' %}"
+                alt="Default Thumbnail"
+                class="video-thumbnail"
+            />
+            {% endif %}
+        </a>
+        <div class="video-info">
+            <div class="video-title">{{ video.title|truncatechars:40 }}</div>
+            <div class="video-description">
+                {{ video.description|truncatechars:60 }}
+            </div>
+            <div class="video-uploader">
+                Uploaded by: <strong>{{ video.uploaded_by.username }}</strong>
+            </div>
+        </div>
     </div>
-  {% endfor %}
+    {% endfor %}
 </div>
 {% endblock %}
-
-

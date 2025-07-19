@@ -1,136 +1,136 @@
-{% extends 'base.html' %}
-
-{% block extra_css %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'comment.css' %}">
-<meta name="csrf-token" content="{{ csrf_token }}">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block extra_css %} {% load static %}
+<link rel="stylesheet" href="{% static 'comment.css' %}" />
+<meta name="csrf-token" content="{{ csrf_token }}" />
+{% endblock %} {% block content %}
 <h2>{{ video.title }}</h2>
 
-<video width="60%" class='video_border' controls>
-  <source src="{{ video.file.url }}" type="video/mp4" />
-  Your browser does not support the video tag.
+<video width="60%" class="video_border" controls>
+    <source src="{{ video.file.url }}" type="video/mp4" />
+    Your browser does not support the video tag.
 </video>
 
 <div class="reaction-buttons">
-  <form method="POST" action="{% url 'react_video' video.id 'like' %}">
-    {% csrf_token %}
-    <button type="submit" class="{% if user in video.liked_by.all %}liked{% endif %}">
-      👍 {{ video.total_likes }}
-    </button>
-  </form>
-
-  <form method="POST" action="{% url 'react_video' video.id 'dislike' %}">
-    {% csrf_token %}
-    <button type="submit" class="{% if user in video.disliked_by.all %}disliked{% endif %}">
-      👎 {{ video.total_dislikes }}
-    </button>
-  </form>
-
-  <p><strong>Views:</strong> {{ video.views }}</p>
-
-
-
-
-
-
-  {% if user.is_authenticated and user != video.uploaded_by %}
-    <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
-      {% csrf_token %}
-      <button type="submit">
-        {% if video.uploaded_by.profile in user.profile.following.all %}
-          Unsubscribe
-        {% else %}
-          Subscribe
-        {% endif %}
-      </button>
+    <form method="POST" action="{% url 'react_video' video.id 'like' %}">
+        {% csrf_token %}
+        <button
+            type="submit"
+            class="{% if user in video.liked_by.all %}liked{% endif %}"
+        >
+            👍 {{ video.total_likes }}
+        </button>
     </form>
-  {% endif %}
-</div>
 
+    <form method="POST" action="{% url 'react_video' video.id 'dislike' %}">
+        {% csrf_token %}
+        <button
+            type="submit"
+            class="{% if user in video.disliked_by.all %}disliked{% endif %}"
+        >
+            👎 {{ video.total_dislikes }}
+        </button>
+    </form>
+
+    <p><strong>Views:</strong> {{ video.views }}</p>
+
+    {% if user.is_authenticated and user != video.uploaded_by %}
+    <form action="{% url 'toggle_follow' video.uploaded_by.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">
+            {% if video.uploaded_by.profile in user.profile.following.all %}
+            Unsubscribe {% else %} Subscribe {% endif %}
+        </button>
+    </form>
+    {% endif %}
+</div>
 
 <p>Uploaded by: {{ video.uploaded_by.username }}</p>
 <p>{{ video.uploaded_by.profile.followers.count }} Subscribers</p>
 <p><strong>Description: </strong><small>{{ video.description }}</small></p>
-<button id="toggle-comments-btn" data-video-id="{{ video.id }}">Comments</button>
+<button id="toggle-comments-btn" data-video-id="{{ video.id }}">
+    Comments
+</button>
 
-<div id="comment-box" style="display: none;">
-  <div id="comment-list"></div>
-  {% if user.is_authenticated %}
+<div id="comment-box" style="display: none">
+    <div id="comment-list"></div>
+    {% if user.is_authenticated %}
     <form id="comment-form" data-video-id="{{ video.id }}">
-      {% csrf_token %}
-      <input type="text" id="comment-input" name="text" placeholder="Add a comment..." required>
-      <button type="submit">Post</button>
+        {% csrf_token %}
+        <input
+            type="text"
+            id="comment-input"
+            name="text"
+            placeholder="Add a comment..."
+            required
+        />
+        <button type="submit">Post</button>
     </form>
-  {% else %}
+    {% else %}
     <p><a href="{% url 'login' %}">Login</a> to comment.</p>
-  {% endif %}
+    {% endif %}
 </div>
 
-
-
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const commentBox = document.getElementById('comment-box');
-    const commentForm = document.getElementById('comment-form');
-    const commentInput = document.getElementById('comment-input');
-    const commentList = document.getElementById('comment-list');
-    const videoId = commentForm.dataset.videoId;
+    document.addEventListener("DOMContentLoaded", function () {
+        const commentBox = document.getElementById("comment-box");
+        const commentForm = document.getElementById("comment-form");
+        const commentInput = document.getElementById("comment-input");
+        const commentList = document.getElementById("comment-list");
+        const videoId = commentForm.dataset.videoId;
 
-    const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrftoken = document
+            .querySelector('meta[name="csrf-token"]')
+            .getAttribute("content");
 
-    let isVisible = false;
+        let isVisible = false;
 
-    // Toggle comment box
-    document.getElementById('toggle-comments-btn').addEventListener('click', () => {
-        isVisible = !isVisible;
-        commentBox.style.display = isVisible ? 'block' : 'none';
-        if (isVisible) loadComments();
-    });
-
-    // Load all comments
-    function loadComments() {
-        fetch(`/video/${videoId}/comments/`)
-            .then(response => response.json())
-            .then(data => {
-                commentList.innerHTML = '';
-                data.comments.forEach(comment => {
-                    commentList.appendChild(createCommentElement(comment));
-                });
+        document
+            .getElementById("toggle-comments-btn")
+            .addEventListener("click", () => {
+                isVisible = !isVisible;
+                commentBox.style.display = isVisible ? "block" : "none";
+                if (isVisible) loadComments();
             });
-    }
 
-    // Submit comment
-    commentForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const text = commentInput.value.trim();
-        if (!text) return;
+        function loadComments() {
+            fetch(`/video/${videoId}/comments/`)
+                .then((response) => response.json())
+                .then((data) => {
+                    commentList.innerHTML = "";
+                    data.comments.forEach((comment) => {
+                        commentList.appendChild(createCommentElement(comment));
+                    });
+                });
+        }
 
-        const payload = new FormData(commentForm);
+        commentForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const text = commentInput.value.trim();
+            if (!text) return;
 
-        fetch(`/video/${videoId}/add-comment/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            body: payload
-        })
-        .then(response => response.json())
-        .then(data => {
-            commentInput.value = '';
-            loadComments();  // Refresh the comment list
-        })
-        .catch(error => console.error('Error adding comment:', error));
-    });
+            const payload = new FormData(commentForm);
 
-    // Create comment + replies
-    function createCommentElement(comment) {
-        const container = document.createElement('div');
-        container.classList.add('comment-block');
+            fetch(`/video/${videoId}/add-comment/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                },
+                body: payload,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    commentInput.value = "";
+                    loadComments();
+                })
+                .catch((error) =>
+                    console.error("Error adding comment:", error)
+                );
+        });
 
-        container.innerHTML = `
+        function createCommentElement(comment) {
+            const container = document.createElement("div");
+            container.classList.add("comment-block");
+
+            container.innerHTML = `
             <div class="comment">
                 <strong>${comment.user}</strong> - <small>${comment.created_at}</small><br>
                 <p>${comment.comment}</p>
@@ -138,61 +138,57 @@
             </div>
         `;
 
-        const replyList = document.createElement('div');
-        replyList.classList.add('replies');
+            const replyList = document.createElement("div");
+            replyList.classList.add("replies");
 
-        comment.replies.forEach(reply => {
-            const replyDiv = document.createElement('div');
-            replyDiv.classList.add('reply');
-            replyDiv.innerHTML = `
+            comment.replies.forEach((reply) => {
+                const replyDiv = document.createElement("div");
+                replyDiv.classList.add("reply");
+                replyDiv.innerHTML = `
                 <strong>${reply.user}</strong> - <small>${reply.created_at}</small><br>
                 <p>${reply.comment}</p>
             `;
-            replyList.appendChild(replyDiv);
-        });
+                replyList.appendChild(replyDiv);
+            });
 
-        container.appendChild(replyList);
+            container.appendChild(replyList);
 
-        // Reply Form
-        const replyForm = document.createElement('form');
-        replyForm.classList.add('reply-form');
-        // Add CSRF token as hidden input
-        replyForm.innerHTML = `
+            const replyForm = document.createElement("form");
+            replyForm.classList.add("reply-form");
+            replyForm.innerHTML = `
             <input type="hidden" name="csrfmiddlewaretoken" value="${csrftoken}" />
             <input type="text" name="text" placeholder="Write a reply..." required />
             <input type="hidden" name="parent_id" value="${comment.id}" />
             <button type="submit">Post</button>
         `;
-        replyForm.style.display = 'none';
-        container.appendChild(replyForm);
+            replyForm.style.display = "none";
+            container.appendChild(replyForm);
 
-        // Toggle reply form
-        const replyBtn = container.querySelector('.reply-btn');
-        replyBtn.addEventListener('click', () => {
-            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Submit reply
-        replyForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(replyForm);
-            fetch(`/video/${videoId}/add-comment/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                loadComments();
+            const replyBtn = container.querySelector(".reply-btn");
+            replyBtn.addEventListener("click", () => {
+                replyForm.style.display =
+                    replyForm.style.display === "none" ? "block" : "none";
             });
-        });
 
-        return container;
-    }
-});
+            replyForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const formData = new FormData(replyForm);
+                fetch(`/video/${videoId}/add-comment/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                    },
+                    body: formData,
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        loadComments();
+                    });
+            });
 
+            return container;
+        }
+    });
 </script>
 
 {% endblock %}

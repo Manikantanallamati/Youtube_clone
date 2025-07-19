@@ -2,51 +2,49 @@
 <link rel="stylesheet" href="{% static 'dashboard.css' %}" />
 {% endblock %} {% block content %}
 <div class="container">
-  <h1 class="dashboard-heading">My Dashboard</h1>
+    <h1 class="dashboard-heading">My Dashboard</h1>
 
-  <div class="dashboard-stats">
-    <div class="stat-box">
-      <p class="stat-title">Followers</p>
-      <p class="stat-count">{{ followers_count }}</p>
-    </div>
-    <div class="stat-box">
-      <p class="stat-title">Following</p>
-      <p class="stat-count">{{ following_count }}</p>
-    </div>
-    <div class="stat-box">
-      <p class="stat-title">Videos Posted</p>
-      <p class="stat-count">{{ videos_count }}</p>
-    </div>
-  </div>
-
-  <h2 class="videos-heading">My Videos</h2>
-  <div class="dashboard-videos-grid">
-    {% for video in videos %}
-    <div class="dashboard-video-card">
-      <a href="{% url 'video_detail' video.id %}" class="video-link">
-        <img
-          src="{{ video.thumbnail.url }}"
-          alt="{{ video.title }}"
-          class="dashboard-thumbnail"
-        />
-        <h3>{{ video.title }}</h3>
-      </a>
-      <p>{{ video.description|truncatewords:10 }}</p>
-      <p class="uploaded-date">Uploaded at: {{ video.uploaded_at }}</p>
-
-      <div class="video-actions">
-        <a href="{% url 'edit_video' video.id %}" class="btn btn-edit"
-          >✏️ Edit</a
-        >
-        <a href="{% url 'delete_video' video.id %}" class="btn btn-delete"
-          >🗑️ Delete</a
-        >
-      </div>
+    <div class="dashboard-stats">
+        <div class="stat-box">
+            <p class="stat-title">Followers</p>
+            <p class="stat-count">{{ followers_count }}</p>
+        </div>
+        <div class="stat-box">
+            <p class="stat-title">Following</p>
+            <p class="stat-count">{{ following_count }}</p>
+        </div>
+        <div class="stat-box">
+            <p class="stat-title">Videos Posted</p>
+            <p class="stat-count">{{ videos_count }}</p>
+        </div>
     </div>
 
-    {% empty %}
-    <p>You haven't uploaded any videos yet.</p>
-    {% endfor %}
-  </div>
+    <h2 class="videos-heading">My Videos</h2>
+    <div class="dashboard-videos-grid">
+        {% for video in videos %}
+        <div class="dashboard-video-card">
+            <a href="{% url 'video_detail' video.id %}" class="video-link">
+                <img
+                    src="{{ video.thumbnail.url }}"
+                    alt="{{ video.title }}"
+                    class="dashboard-thumbnail"
+                />
+                <h3>{{ video.title }}</h3>
+            </a>
+            <p>{{ video.description|truncatewords:10 }}</p>
+            <p class="uploaded-date">Uploaded at: {{ video.uploaded_at }}</p>
+
+            <div class="video-actions">
+                <a href="{% url 'edit_video' video.id %}" class="btn btn-edit"
+                    >✏️ Edit</a>
+                <a href="{% url 'delete_video' video.id %}"
+                    class="btn btn-delete">🗑️ Delete</a>
+            </div>
+        </div>
+
+        {% empty %}
+        <p>You haven't uploaded any videos yet.</p>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
